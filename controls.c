@@ -612,196 +612,196 @@ int main(int argc, char *argv[]) {
   SDL_RenderPresent(renderer);
   int button, axis; // Used for checking dynamic joystick mappings
 
-  while(running) {
-    while( SDL_PollEvent(&event) != 0 ) {
-        switch(event.type) {
-            case SDL_QUIT:
-                running = 0;
-                break;
-	    case SDL_WINDOWEVENT:
-		switch(event.window.event) {
-		case SDL_WINDOWEVENT_ENTER:
-		case SDL_WINDOWEVENT_RESIZED:
-			redraw_screen();
-			break;
-		}
-                break;
-	    case SDL_KEYDOWN:
-		switch(event.key.keysym.sym) {
-		    case SDLK_UP:
-			throttle = 1;
-			break;
-		    case SDLK_LEFT:
-			turning = -1;
-			break;
-		    case SDLK_RIGHT:
-			turning = 1;
-			break;
-		    case SDLK_LSHIFT:
-			lock_enabled = 1;
-			if(unlock_enabled) send_lock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-			break;
-		    case SDLK_RSHIFT:
-			unlock_enabled = 1;
-			if(lock_enabled) send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-			break;
-		    case SDLK_a:
-			if(lock_enabled) {
-				send_lock(CAN_DOOR1_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR1_LOCK);
-			}
-			break;
-		    case SDLK_b:
-			if(lock_enabled) {
-				send_lock(CAN_DOOR2_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR2_LOCK);
-			}
-			break;
-		    case SDLK_x:
-			if(lock_enabled) {
-				send_lock(CAN_DOOR3_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR3_LOCK);
-			}
-			break;
-		    case SDLK_y:
-			if(lock_enabled) {
-				send_lock(CAN_DOOR4_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR4_LOCK);
-			}
-			break;
-		}
-		kk_check(event.key.keysym.sym);
-	   	break;
-	    case SDL_KEYUP:
-		switch(event.key.keysym.sym) {
-		    case SDLK_UP:
-			throttle = -1;
-			break;
-		    case SDLK_LEFT:
-		    case SDLK_RIGHT:
-			turning = 0;
-			break;
-		    case SDLK_LSHIFT:
-			lock_enabled = 0;
-			break;
-		    case SDLK_RSHIFT:
-			unlock_enabled = 0;
-			break;
+ while(running) {
+   while( SDL_PollEvent(&event) != 0 ) {
+       switch(event.type) {
+           case SDL_QUIT:
+               running = 0;
+               break;
+    case SDL_WINDOWEVENT:
+	switch(event.window.event) {
+	case SDL_WINDOWEVENT_ENTER:
+	case SDL_WINDOWEVENT_RESIZED:
+		redraw_screen();
+		break;
+	}
+               break;
+    case SDL_KEYDOWN:
+	switch(event.key.keysym.sym) {
+	    case SDLK_UP:
+		throttle = 1;
+		break;
+	    case SDLK_LEFT:
+		turning = -1;
+		break;
+	    case SDLK_RIGHT:
+		turning = 1;
+		break;
+	    case SDLK_LSHIFT:
+		lock_enabled = 1;
+		if(unlock_enabled) send_lock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
+		break;
+	    case SDLK_RSHIFT:
+		unlock_enabled = 1;
+		if(lock_enabled) send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
+		break;
+	    case SDLK_a:
+		if(lock_enabled) {
+			send_lock(CAN_DOOR1_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR1_LOCK);
 		}
 		break;
-	    case SDL_JOYAXISMOTION:
-		axis = event.jaxis.axis;
-		if(axis == gAxisLeftH) {
-			ud(event.jaxis.value);
-		} else if(axis == gAxisLeftV) {
-			turn(event.jaxis.value);
-		} else if(axis == gAxisR2) {
-			accelerate(event.jaxis.value);
-		} else if(axis == gAxisRightH ||
-			  axis == gAxisRightV ||
-			  axis == gAxisL2 ||
-			  axis == gJoyX ||
-			  axis == gJoyY ||
-			  axis == gJoyZ) {
-			// Do nothing, the axis is known just not connected
-		} else {
-			if (debug) printf("Unkown axis: %d\n", event.jaxis.axis);
+	    case SDLK_b:
+		if(lock_enabled) {
+			send_lock(CAN_DOOR2_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR2_LOCK);
 		}
 		break;
-	    case SDL_JOYBUTTONDOWN:
-                button = event.jbutton.button;
-		if(button == gButtonLock) {
-			lock_enabled = 1;
-			if(unlock_enabled) send_lock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-		} else if(button == gButtonUnlock) {
-			unlock_enabled = 1;
-			if(lock_enabled) send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-		} else if(button == gButtonA) {
-			if(lock_enabled) {
-				send_lock(CAN_DOOR1_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR1_LOCK);
-			}
-			kk_check(SDLK_a);
-		} else if (button == gButtonB) {
-			if(lock_enabled) {
-				send_lock(CAN_DOOR2_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR2_LOCK);
-			}
-			kk_check(SDLK_b);
-		} else if (button == gButtonX) {
-			if(lock_enabled) {
-				send_lock(CAN_DOOR3_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR3_LOCK);
-			}
-			kk_check(SDLK_x);
-		} else if (button == gButtonY) {
-			if(lock_enabled) {
-				send_lock(CAN_DOOR4_LOCK);
-			} else if(unlock_enabled) {
-				send_unlock(CAN_DOOR4_LOCK);
-			}
-			kk_check(SDLK_y);
-		} else if (button == gButtonStart) {
-			kk_check(SDLK_RETURN);
-		} else {
-			if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
+	    case SDLK_x:
+		if(lock_enabled) {
+			send_lock(CAN_DOOR3_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR3_LOCK);
 		}
 		break;
-	    case SDL_JOYBUTTONUP:
-		button = event.jbutton.button;
-		if(button == gButtonLock) {
-			lock_enabled = 0;
-		} else if(button == gButtonUnlock) {
-			unlock_enabled = 0;
-		} else {
-			//if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
+	    case SDLK_y:
+		if(lock_enabled) {
+			send_lock(CAN_DOOR4_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR4_LOCK);
 		}
 		break;
-	    case SDL_JOYDEVICEADDED:
-		// Only use the first controller
-		if(event.cdevice.which == 0) {
-			gJoystick = SDL_JoystickOpen(0);
-			if(gJoystick) {
-				gHaptic = SDL_HapticOpenFromJoystick(gJoystick);
-				print_joy_info();
-			}
-		}
+	}
+	kk_check(event.key.keysym.sym);
+   	break;
+    case SDL_KEYUP:
+	switch(event.key.keysym.sym) {
+	    case SDLK_UP:
+		throttle = -1;
 		break;
-	    case SDL_JOYDEVICEREMOVED:
-		if(event.cdevice.which == 0) {
-			SDL_JoystickClose(gJoystick);
-			gJoystick = NULL;
-		}
+	    case SDLK_LEFT:
+	    case SDLK_RIGHT:
+		turning = 0;
 		break;
-	    case SDL_CONTROLLERDEVICEADDED:
-		// Only use the first controller
-		if(gGameController == NULL) {
-			gGameController = SDL_GameControllerOpen(0);
-			gJoystick = SDL_GameControllerGetJoystick(gGameController);
+	    case SDLK_LSHIFT:
+		lock_enabled = 0;
+		break;
+	    case SDLK_RSHIFT:
+		unlock_enabled = 0;
+		break;
+	}
+	break;
+    case SDL_JOYAXISMOTION:
+	axis = event.jaxis.axis;
+	if(axis == gAxisLeftH) {
+		ud(event.jaxis.value);
+	} else if(axis == gAxisLeftV) {
+		turn(event.jaxis.value);
+	} else if(axis == gAxisR2) {
+		accelerate(event.jaxis.value);
+	} else if(axis == gAxisRightH ||
+		  axis == gAxisRightV ||
+		  axis == gAxisL2 ||
+		  axis == gJoyX ||
+		  axis == gJoyY ||
+		  axis == gJoyZ) {
+		// Do nothing, the axis is known just not connected
+	} else {
+		if (debug) printf("Unkown axis: %d\n", event.jaxis.axis);
+	}
+	break;
+    case SDL_JOYBUTTONDOWN:
+               button = event.jbutton.button;
+	if(button == gButtonLock) {
+		lock_enabled = 1;
+		if(unlock_enabled) send_lock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
+	} else if(button == gButtonUnlock) {
+		unlock_enabled = 1;
+		if(lock_enabled) send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
+	} else if(button == gButtonA) {
+		if(lock_enabled) {
+			send_lock(CAN_DOOR1_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR1_LOCK);
+		}
+		kk_check(SDLK_a);
+	} else if (button == gButtonB) {
+		if(lock_enabled) {
+			send_lock(CAN_DOOR2_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR2_LOCK);
+		}
+		kk_check(SDLK_b);
+	} else if (button == gButtonX) {
+		if(lock_enabled) {
+			send_lock(CAN_DOOR3_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR3_LOCK);
+		}
+		kk_check(SDLK_x);
+	} else if (button == gButtonY) {
+		if(lock_enabled) {
+			send_lock(CAN_DOOR4_LOCK);
+		} else if(unlock_enabled) {
+			send_unlock(CAN_DOOR4_LOCK);
+		}
+		kk_check(SDLK_y);
+	} else if (button == gButtonStart) {
+		kk_check(SDLK_RETURN);
+	} else {
+		if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
+	}
+	break;
+    case SDL_JOYBUTTONUP:
+	button = event.jbutton.button;
+	if(button == gButtonLock) {
+		lock_enabled = 0;
+	} else if(button == gButtonUnlock) {
+		unlock_enabled = 0;
+	} else {
+		//if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
+	}
+	break;
+    case SDL_JOYDEVICEADDED:
+	// Only use the first controller
+	if(event.cdevice.which == 0) {
+		gJoystick = SDL_JoystickOpen(0);
+		if(gJoystick) {
 			gHaptic = SDL_HapticOpenFromJoystick(gJoystick);
 			print_joy_info();
 		}
-		break;
-	    case SDL_CONTROLLERDEVICEREMOVED:
-		if(event.cdevice.which == 0) {
-			SDL_GameControllerClose(gGameController);
-			gGameController = NULL;
-		}
-		break;
-        }
-    }
-    currentTime = SDL_GetTicks();
-    checkAccel();
-    checkTurn();
-    SDL_Delay(5);
-  }
+	}
+	break;
+    case SDL_JOYDEVICEREMOVED:
+	if(event.cdevice.which == 0) {
+		SDL_JoystickClose(gJoystick);
+		gJoystick = NULL;
+	}
+	break;
+    case SDL_CONTROLLERDEVICEADDED:
+	// Only use the first controller
+	if(gGameController == NULL) {
+		gGameController = SDL_GameControllerOpen(0);
+		gJoystick = SDL_GameControllerGetJoystick(gGameController);
+		gHaptic = SDL_HapticOpenFromJoystick(gJoystick);
+		print_joy_info();
+	}
+	break;
+    case SDL_CONTROLLERDEVICEREMOVED:
+	if(event.cdevice.which == 0) {
+		SDL_GameControllerClose(gGameController);
+		gGameController = NULL;
+	}
+	break;
+       }
+   }
+   currentTime = SDL_GetTicks();
+   checkAccel();
+   checkTurn();
+   SDL_Delay(5);
+ }
 
   close(s);
   SDL_DestroyTexture(base_texture);
